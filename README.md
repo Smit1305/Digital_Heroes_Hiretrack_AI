@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HireTrack AI — Modern Applicant Tracking System (ATS)
 
-## Getting Started
+HireTrack AI is a fully featured, collaborative, production-ready applicant tracking system (ATS) built on Next.js 15, React 19, TypeScript, PostgreSQL, and Prisma. It is designed to assist recruiters and hiring managers in managing candidate funnels, scheduling interviews, and making data-driven decisions.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Key Features
+
+- **Multi-Tenant Architecture**: Robust tenant grouping isolated around organizations.
+- **Kanban Pipeline Board**: Drag-and-drop workflow columns powered by `@hello-pangea/dnd` to advance candidate applications.
+- **Unified Interview Management**: Schedule, edit, cancel, or log feedback ratings with a calendar view.
+- **Rich Analytics & Dashboard**: Instant visual charts representing candidate sources, funnel dropout rates, top hiring managers, and KPIs.
+- **Role-Based Access Control (RBAC)**: Enforced system actions for Super Admins, Recruiters, Hiring Managers, and Interviewers.
+- **Structured Observability**: Built-in JSON structured logging, full Sentry telemetry configurations, and Vercel Analytics.
+- **Modern UI/UX**: Sleek shadcn/ui components, custom dark mode toggle, and micro-interactions powered by Framer Motion.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router), React 19, TypeScript (strict mode)
+- **Database & ORM**: PostgreSQL, Prisma Client with `@prisma/adapter-pg`
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Authentication**: Auth.js (NextAuth v5 beta)
+- **Validation**: Zod
+- **Testing**: Vitest (Unit/Integration), Playwright (E2E)
+- **Observability**: Sentry, Vercel Analytics
+
+---
+
+## ⚙️ Environment Variables
+
+Copy `.env.example` into a local `.env` and fill in the values:
+
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/hiretrack_ai"
+AUTH_SECRET="your-32-character-secret-key"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+UPSTASH_REDIS_URL="redis://localhost:6379"
+UPSTASH_REDIS_TOKEN="your-redis-token"
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_FROM="HireTrack AI <noreply@hiretrack.ai>"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Refer to [docs/deployment/vercel.md](docs/deployment/vercel.md) for production-specific variable structures.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚦 Getting Started
 
-## Learn More
+### 1. Install dependencies
+```bash
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Configure Database
+Apply migrations and compile the Prisma client:
+```bash
+npx prisma migrate dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Seed Mock Data
+Seed default accounts (admin, recruiter, candidate) and mock metrics:
+```bash
+npm run db:seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Start Development Server
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔑 Demo Access Accounts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Use these pre-configured credentials after seeding:
+
+| Role | Email | Password | Organization |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `admin@hiretrack.ai` | `adminpassword123` | Acme Inc. |
+| **Recruiter** | `recruiter@hiretrack.ai` | `recruiterpassword123` | Acme Inc. |
+| **Candidate** | `candidate@hiretrack.ai` | `candidatepassword123` | Acme Inc. |
+
+---
+
+## 🐳 Docker Deployment
+
+Orchestrate the app, postgres, and redis locally:
+```bash
+# Build and boot containers
+docker-compose up -d --build
+
+# Run migrations inside the app container
+docker-compose exec app npx prisma migrate deploy
+
+# Seed the database
+docker-compose exec app npm run db:seed
+```
+See [docker/README.md](docker/README.md) for detailed docker commands.
+
+---
+
+## 🧪 Testing Suite
+
+We maintain a strict testing coverage rule.
+
+### Run Unit & Integration Tests
+```bash
+npm run test
+```
+
+### Run End-to-End Tests
+```bash
+npm run test:e2e
+```
+
+---
+
+## 📄 License & Security
+
+- Distributed under the [MIT License](LICENSE).
+- Security policies and vulnerability disclosures are outlined in [SECURITY.md](SECURITY.md).

@@ -46,11 +46,11 @@ async function hashPassword(plain: string): Promise<string> {
 // ─── Seed Data Definitions ────────────────────────────────────────────────────
 
 const ORG = {
-  name: 'Acme Corp',
-  slug: 'acme-corp',
+  name: 'Acme Inc.',
+  slug: 'acme-inc',
   logo: 'https://api.dicebear.com/7.x/initials/svg?seed=Acme',
   plan: 'PRO' as const,
-  website: 'https://acmecorp.example.com',
+  website: 'https://acmeinc.example.com',
   industry: 'Technology',
   size: '201-500',
 }
@@ -63,18 +63,25 @@ const USERS: Array<{
   avatar: string
 }> = [
   {
-    name: 'Demo User',
-    email: 'demo@hiretrack.ai',
-    password: 'demo1234',
+    name: 'Demo Recruiter',
+    email: 'recruiter@hiretrack.ai',
+    password: 'recruiterpassword123',
     role: 'RECRUITER',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=recruiter',
   },
   {
-    name: 'Alice Chen',
-    email: 'alice@acmecorp.example.com',
-    password: 'Password1',
+    name: 'Super Admin',
+    email: 'admin@hiretrack.ai',
+    password: 'adminpassword123',
     role: 'SUPER_ADMIN',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+  },
+  {
+    name: 'Demo Candidate',
+    email: 'candidate@hiretrack.ai',
+    password: 'candidatepassword123',
+    role: 'CANDIDATE',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=candidate',
   },
   {
     name: 'Bob Martinez',
@@ -702,10 +709,11 @@ async function main() {
   }
 
   // Convenient references
-  const demoUser = createdUsers[0]!   // demo@hiretrack.ai — RECRUITER
-  const adminUser = createdUsers[1]!  // alice — SUPER_ADMIN
-  const hmUser = createdUsers[2]!     // bob   — HIRING_MANAGER
-  const interviewerUser = createdUsers[3]! // carol — INTERVIEWER
+  const demoUser = createdUsers[0]!   // recruiter@hiretrack.ai — RECRUITER (demoUser variable kept to avoid breaking rest of code references)
+  const adminUser = createdUsers[1]!  // admin@hiretrack.ai — SUPER_ADMIN
+  const candidateUser = createdUsers[2]! // candidate@hiretrack.ai — CANDIDATE
+  const hmUser = createdUsers[3]!     // bob — HIRING_MANAGER
+  const interviewerUser = createdUsers[4]! // carol — INTERVIEWER
 
   // ── 3. Jobs ──────────────────────────────────────────────────────────────────
   console.log('  Creating jobs...')

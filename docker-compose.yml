@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ─── Database Service ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: hiretrack-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: hiretrack_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hiretrack_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hiretrack-network
+
+  # ─── Redis Cache Service ────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: hiretrack-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hiretrack-network
+
+  # ─── Web Application Service ────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiretrack-app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/hiretrack_ai?schema=public
+      - AUTH_SECRET=hiretrack-ai-super-secret-key-32chars-min-2024
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NODE_ENV=production
+      - UPSTASH_REDIS_URL=redis://redis:6379
+      - EMAIL_FROM=noreply@hiretrack.ai
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - hiretrack-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  hiretrack-network:
+    driver: bridge

@@ -1,0 +1,36 @@
+name: Deployment Preview
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  preview:
+    name: Build & Preview Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Production Compilation
+        run: npm run build
+        env:
+          DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/hiretrack_ai?schema=public"
+          AUTH_SECRET: "mock-secret-key-at-least-32-chars-long-1234"
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          NODE_ENV: "production"
+
+      - name: Preview Deployment Info
+        run: |
+          echo "🚀 Pull Request verification completed successfully!"
+          echo "The build compiles fine. It is ready for preview deployment on Vercel."

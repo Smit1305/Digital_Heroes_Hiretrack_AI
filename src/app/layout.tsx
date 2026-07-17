@@ -1,5 +1,6 @@
 import { JsonLd } from '@/components/json-ld'
 import { Providers } from '@/components/providers'
+import { Analytics } from '@vercel/analytics/react'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
@@ -149,6 +150,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <JsonLd data={orgJsonLd} />
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   )
