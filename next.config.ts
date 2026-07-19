@@ -81,9 +81,9 @@ const nextConfig: NextConfig = {
   // Compress responses
   compress: true,
 
-  // Disable development indicators
+  // Development indicators configuration
   devIndicators: {
-    buildActivity: false,
+    position: 'bottom-right',
   },
 
   // Experimental features
