@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Briefcase, Building2, Calendar, Landmark, MapPin, Sparkles } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 interface JobDetailsProps {
   params: Promise<{ slug: string; jobId: string }>
 }

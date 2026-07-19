@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CareersClient } from '@/app/(marketing)/careers/careers-client'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Public Careers Portal — HireTrack AI',
   description: 'Browse open positions across organizations and join high-performing teams.',

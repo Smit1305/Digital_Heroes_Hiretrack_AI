@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { ApplyForm } from './apply-form'
 
+export const dynamic = 'force-dynamic'
+
 interface ApplyPageProps {
   params: Promise<{ slug: string; jobId: string }>
 }

@@ -7,6 +7,8 @@ import { OfferActions } from './offer-actions'
 import { Briefcase, Building2, Calendar, MapPin, Video } from 'lucide-react'
 import { ApplicationStage, OfferStatus } from '@prisma/client'
 
+export const dynamic = 'force-dynamic'
+
 interface ApplicationTrackerProps {
   params: Promise<{ applicationId: string }>
 }

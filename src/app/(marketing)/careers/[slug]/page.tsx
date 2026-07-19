@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import { CareersClient } from '@/app/(marketing)/careers/careers-client'
 import { Building2, Globe, Landmark, Users } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 interface OrgPageProps {
   params: Promise<{ slug: string }>
 }
