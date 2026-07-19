@@ -14,6 +14,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { signIn } from 'next-auth/react'
+import { registerCompanyAction } from '@/server/actions/company'
 import { companyRegisterSchema, type CompanyRegisterInput } from '@/validators/company'
 import { OrgPlan } from '@/types/enums'
 
@@ -74,34 +76,46 @@ export function RegisterCompanyForm() {
   async function onSubmit(data: CompanyRegisterInput) {
     setServerError(null)
 
-    // 1. Client-side check: does email already exist?
+    // 1. Submit company and owner registration
     try {
-      const checkRes = await fetch(`/api/auth/check-email?email=${encodeURIComponent(data.email)}`)
-      const checkData = await checkRes.json()
-      if (checkData.exists) {
-        setError('email', { message: 'An account with this email already exists.' })
+      const result = await registerCompanyAction(data)
+      if (!result.success) {
+        if (result.fieldErrors) {
+          Object.entries(result.fieldErrors).forEach(([key, messages]) => {
+            setError(key as keyof CompanyRegisterInput, { message: messages[0] })
+          })
+        } else {
+          setServerError(result.error)
+        }
         return
       }
-    } catch {
-      // Allow fallback if endpoint isn't fully compiled yet
-    }
 
-    // 2. Save registration data in sessionStorage
-    try {
-      sessionStorage.setItem('hiretrack_temp_company_reg', JSON.stringify(data))
-      toast.success('Registration details saved. Redirecting to checkout…')
-      router.push(`/checkout?plan=${data.plan.toLowerCase()}&billing=${data.billingPeriod.toLowerCase()}`)
+      toast.success('Organization & Owner account registered successfully!')
+
+      // 2. Automatically sign in owner or redirect to login
+      const res = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      })
+
+      if (res?.ok) {
+        router.push('/dashboard')
+        router.refresh()
+      } else {
+        router.push(`/auth/login?email=${encodeURIComponent(data.email)}&registered=true`)
+      }
     } catch {
-      setServerError('Failed to process registration details. Please try again.')
+      setServerError('An unexpected error occurred during company registration. Please try again.')
     }
   }
 
   return (
     <Card className="w-full shadow-sm max-w-lg mx-auto">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-bold">Register Your Organization</CardTitle>
+        <CardTitle className="text-xl font-bold">Register Company / Organization</CardTitle>
         <CardDescription>
-          Onboard your company workspace and configure owner admin credentials.
+          Onboard your company workspace and setup owner account details.
         </CardDescription>
       </CardHeader>
 
@@ -267,10 +281,10 @@ export function RegisterCompanyForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing…
+                Registering Organization…
               </>
             ) : (
-              'Proceed to Checkout'
+              'Register Company & Owner Account'
             )}
           </Button>
         </form>

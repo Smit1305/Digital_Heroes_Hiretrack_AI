@@ -52,10 +52,10 @@ export default function SelectAccountPage() {
 
             <div className="space-y-2 pt-2">
               <Link
-                href="/auth/register"
+                href="/register-company"
                 className={cn(buttonVariants({ variant: 'default' }), 'w-full justify-between')}
               >
-                <span>Create Employer Account</span>
+                <span>Register Company / Organization</span>
                 <ChevronRight className="h-4 w-4" />
               </Link>
               <Link
