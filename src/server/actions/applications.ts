@@ -3,6 +3,7 @@
 import { requirePermission } from '@/lib/auth-utils'
 import { db } from '@/lib/db'
 import { sendEmail } from '@/lib/email'
+import { getAppBaseUrl } from '@/lib/app-url'
 import type { ActionResult } from '@/types/api'
 import {
   createOfferSchema,
@@ -143,9 +144,8 @@ export async function publicApplyAction(
     return { success: false, error: 'You have already applied for this job listing.' }
   }
 
-  // Send mock confirmation email (async)
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const trackingUrl = `${appUrl}/careers/applications/${result.applicationId}`
+  // Send confirmation email (async)
+  const trackingUrl = await getAppBaseUrl(`/careers/applications/${result.applicationId}`)
 
   await sendEmail({
     to: email,

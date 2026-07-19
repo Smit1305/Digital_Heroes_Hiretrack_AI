@@ -10,6 +10,7 @@ import { UserRole } from '@/types/enums'
 
 import { sendEmail } from '@/lib/email'
 import { checkUserLimit } from '@/lib/plan-limits'
+import { getAppBaseUrl } from '@/lib/app-url'
 
 const inviteSchema = z.object({
   email: z.string().email('Please enter a valid email address').trim().toLowerCase(),
@@ -82,9 +83,7 @@ export async function inviteUserAction(input: InviteInput): Promise<ActionResult
       }
     })
 
-    // Dispatch invite email
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-    const inviteUrl = `${baseUrl.replace(/\/$/, '')}/auth/accept-invite?token=${token}`
+    const inviteUrl = await getAppBaseUrl(`/auth/accept-invite?token=${token}`)
 
     await sendEmail({
       to: email,

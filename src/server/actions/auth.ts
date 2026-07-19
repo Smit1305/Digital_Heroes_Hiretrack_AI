@@ -24,10 +24,7 @@ import { headers } from 'next/headers'
 const EMAIL_VERIFICATION_PREFIX = 'email-verification:'
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000
 
-function getAppUrl(path: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.AUTH_URL ?? 'http://localhost:3000'
-  return `${baseUrl.replace(/\/$/, '')}${path}`
-}
+import { getAppBaseUrl } from '@/lib/app-url'
 
 async function getRateLimitKey(scope: string, identifier: string): Promise<string> {
   const headerStore = await headers()
@@ -73,7 +70,7 @@ async function createEmailVerificationToken(email: string): Promise<string> {
 }
 
 async function sendVerificationEmail(email: string, token: string): Promise<void> {
-  const verificationUrl = getAppUrl(`/auth/verify?token=${token}`)
+  const verificationUrl = await getAppBaseUrl(`/auth/verify?token=${token}`)
 
   await sendEmail({
     to: email,
@@ -273,7 +270,7 @@ export async function forgotPasswordAction(
       },
     })
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`
+    const resetUrl = await getAppBaseUrl(`/auth/reset-password?token=${token}`)
     await sendEmail({
       to: email,
       subject: 'Reset your HireTrack AI password',
