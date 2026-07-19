@@ -39,7 +39,7 @@ const envSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
 
   // App
-  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+  NEXT_PUBLIC_APP_URL: z.string().url().default('https://digital-heroes-hiretrack-ai.vercel.app'),
   NEXT_PUBLIC_APP_NAME: z.string().default('HireTrack AI'),
 
   // Node
