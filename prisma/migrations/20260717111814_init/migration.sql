@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'RECRUITER', 'HIRING_MANAGER', 'INTERVIEWER', 'VIEWER');
+CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'OWNER', 'RECRUITER', 'HIRING_MANAGER', 'INTERVIEWER', 'VIEWER', 'CANDIDATE');
 
 -- CreateEnum
 CREATE TYPE "OrgPlan" AS ENUM ('FREE', 'STARTER', 'PRO', 'ENTERPRISE');
@@ -14,10 +14,10 @@ CREATE TYPE "EmploymentType" AS ENUM ('FULL_TIME', 'PART_TIME', 'CONTRACT', 'INT
 CREATE TYPE "CandidateStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'BLACKLISTED');
 
 -- CreateEnum
-CREATE TYPE "ApplicationStage" AS ENUM ('APPLIED', 'SCREENING', 'INTERVIEW', 'TECHNICAL', 'HR_ROUND', 'OFFER', 'HIRED', 'REJECTED');
+CREATE TYPE "ApplicationStage" AS ENUM ('APPLIED', 'SCREENING', 'INTERVIEW', 'TECHNICAL', 'HR_ROUND', 'OFFER', 'HIRED', 'REJECTED', 'WITHDRAWN');
 
 -- CreateEnum
-CREATE TYPE "InterviewType" AS ENUM ('PHONE', 'VIDEO', 'ONSITE', 'TECHNICAL', 'HR', 'PANEL');
+CREATE TYPE "InterviewType" AS ENUM ('PHONE', 'VIDEO', 'ONSITE', 'HR', 'TECHNICAL', 'CODING', 'SYSTEM_DESIGN', 'BEHAVIORAL', 'CULTURAL_FIT', 'MANAGER_ROUND', 'PANEL');
 
 -- CreateEnum
 CREATE TYPE "InterviewStatus" AS ENUM ('SCHEDULED', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'RESCHEDULED');
@@ -27,6 +27,9 @@ CREATE TYPE "ActivityAction" AS ENUM ('CREATED', 'UPDATED', 'DELETED', 'STAGE_CH
 
 -- CreateEnum
 CREATE TYPE "EntityType" AS ENUM ('JOB', 'CANDIDATE', 'APPLICATION', 'INTERVIEW', 'NOTE', 'USER', 'ORGANIZATION');
+
+-- CreateEnum
+CREATE TYPE "OfferStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED_BY_CANDIDATE', 'ACCEPTED');
 
 -- CreateTable
 CREATE TABLE "Account" (
@@ -89,6 +92,8 @@ CREATE TABLE "User" (
     "avatar" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'VIEWER',
     "organizationId" TEXT,
+    "teamId" TEXT,
+    "customRoleId" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "lastLoginAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -142,6 +147,7 @@ CREATE TABLE "Job" (
     "hiringManagerId" TEXT,
     "createdById" TEXT,
     "organizationId" TEXT NOT NULL,
+    "teamId" TEXT,
     "deletedAt" TIMESTAMP(3),
     "publishedAt" TIMESTAMP(3),
     "closedAt" TIMESTAMP(3),
@@ -217,6 +223,21 @@ CREATE TABLE "Interview" (
 );
 
 -- CreateTable
+CREATE TABLE "Scorecard" (
+    "id" TEXT NOT NULL,
+    "interviewId" TEXT NOT NULL,
+    "recommendation" TEXT NOT NULL,
+    "summary" TEXT NOT NULL,
+    "strengths" TEXT NOT NULL,
+    "weaknesses" TEXT NOT NULL,
+    "ratings" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Scorecard_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Note" (
     "id" TEXT NOT NULL,
     "content" TEXT NOT NULL,
@@ -278,6 +299,113 @@ CREATE TABLE "Notification" (
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Offer" (
+    "id" TEXT NOT NULL,
+    "applicationId" TEXT NOT NULL,
+    "salary" INTEGER NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'USD',
+    "startDate" TIMESTAMP(3) NOT NULL,
+    "notes" TEXT,
+    "status" "OfferStatus" NOT NULL DEFAULT 'PENDING',
+    "approvedBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Offer_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Team" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "organizationId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Team_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Role" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "organizationId" TEXT NOT NULL,
+    "isSystem" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Permission" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RolePermission" (
+    "roleId" TEXT NOT NULL,
+    "permissionId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "RolePermission_pkey" PRIMARY KEY ("roleId","permissionId")
+);
+
+-- CreateTable
+CREATE TABLE "CandidateProfile" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "phone" TEXT,
+    "linkedinUrl" TEXT,
+    "portfolioUrl" TEXT,
+    "githubUrl" TEXT,
+    "resumeUrl" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "CandidateProfile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Plan" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "monthlyPrice" INTEGER NOT NULL,
+    "yearlyPrice" INTEGER NOT NULL,
+    "maxUsers" INTEGER NOT NULL,
+    "maxJobs" INTEGER NOT NULL,
+    "maxCandidates" INTEGER NOT NULL DEFAULT 500,
+    "features" TEXT[],
+
+    CONSTRAINT "Plan_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Subscription" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "planId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "stripeCustomerId" TEXT,
+    "stripeSubscriptionId" TEXT,
+    "billingPeriod" TEXT NOT NULL DEFAULT 'MONTHLY',
+    "currentPeriodEnd" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Subscription_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE INDEX "Account_userId_idx" ON "Account"("userId");
 
@@ -315,6 +443,12 @@ CREATE INDEX "User_organizationId_idx" ON "User"("organizationId");
 CREATE INDEX "User_role_idx" ON "User"("role");
 
 -- CreateIndex
+CREATE INDEX "User_teamId_idx" ON "User"("teamId");
+
+-- CreateIndex
+CREATE INDEX "User_customRoleId_idx" ON "User"("customRoleId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "PasswordReset_token_key" ON "PasswordReset"("token");
 
 -- CreateIndex
@@ -349,6 +483,9 @@ CREATE INDEX "Job_createdAt_idx" ON "Job"("createdAt");
 
 -- CreateIndex
 CREATE INDEX "Job_department_idx" ON "Job"("department");
+
+-- CreateIndex
+CREATE INDEX "Job_teamId_idx" ON "Job"("teamId");
 
 -- CreateIndex
 CREATE INDEX "Candidate_organizationId_idx" ON "Candidate"("organizationId");
@@ -394,6 +531,9 @@ CREATE INDEX "Interview_scheduledAt_idx" ON "Interview"("scheduledAt");
 
 -- CreateIndex
 CREATE INDEX "Interview_status_idx" ON "Interview"("status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Scorecard_interviewId_key" ON "Scorecard"("interviewId");
 
 -- CreateIndex
 CREATE INDEX "Note_authorId_idx" ON "Note"("authorId");
@@ -446,6 +586,39 @@ CREATE INDEX "Notification_read_idx" ON "Notification"("read");
 -- CreateIndex
 CREATE INDEX "Notification_createdAt_idx" ON "Notification"("createdAt");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Offer_applicationId_key" ON "Offer"("applicationId");
+
+-- CreateIndex
+CREATE INDEX "Team_organizationId_idx" ON "Team"("organizationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Team_name_organizationId_key" ON "Team"("name", "organizationId");
+
+-- CreateIndex
+CREATE INDEX "Role_organizationId_idx" ON "Role"("organizationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_name_organizationId_key" ON "Role"("name", "organizationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Permission_name_key" ON "Permission"("name");
+
+-- CreateIndex
+CREATE INDEX "RolePermission_roleId_idx" ON "RolePermission"("roleId");
+
+-- CreateIndex
+CREATE INDEX "RolePermission_permissionId_idx" ON "RolePermission"("permissionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CandidateProfile_userId_key" ON "CandidateProfile"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Plan_name_key" ON "Plan"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Subscription_organizationId_key" ON "Subscription"("organizationId");
+
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -454,6 +627,12 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_customRoleId_fkey" FOREIGN KEY ("customRoleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PasswordReset" ADD CONSTRAINT "PasswordReset_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -469,6 +648,9 @@ ALTER TABLE "Job" ADD CONSTRAINT "Job_hiringManagerId_fkey" FOREIGN KEY ("hiring
 
 -- AddForeignKey
 ALTER TABLE "Job" ADD CONSTRAINT "Job_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Job" ADD CONSTRAINT "Job_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Candidate" ADD CONSTRAINT "Candidate_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -487,6 +669,9 @@ ALTER TABLE "Interview" ADD CONSTRAINT "Interview_applicationId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "Interview" ADD CONSTRAINT "Interview_interviewerId_fkey" FOREIGN KEY ("interviewerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Scorecard" ADD CONSTRAINT "Scorecard_interviewId_fkey" FOREIGN KEY ("interviewId") REFERENCES "Interview"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Note" ADD CONSTRAINT "Note_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -520,3 +705,27 @@ ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_organizationId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Offer" ADD CONSTRAINT "Offer_applicationId_fkey" FOREIGN KEY ("applicationId") REFERENCES "Application"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Team" ADD CONSTRAINT "Team_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Role" ADD CONSTRAINT "Role_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RolePermission" ADD CONSTRAINT "RolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RolePermission" ADD CONSTRAINT "RolePermission_permissionId_fkey" FOREIGN KEY ("permissionId") REFERENCES "Permission"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CandidateProfile" ADD CONSTRAINT "CandidateProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_fkey" FOREIGN KEY ("planId") REFERENCES "Plan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
