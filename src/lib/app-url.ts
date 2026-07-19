@@ -13,7 +13,7 @@ export async function getAppBaseUrl(path: string = ''): Promise<string> {
   const cleanPath = path ? (path.startsWith('/') ? path : `/${path}`) : ''
 
   const envUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.AUTH_URL || process.env.NEXTAUTH_URL
-  if (envUrl && !envUrl.includes('localhost')) {
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('netlify.app')) {
     const formatted = envUrl.startsWith('http') ? envUrl : `https://${envUrl}`
     return `${formatted.replace(/\/$/, '')}${cleanPath}`
   }
@@ -30,11 +30,16 @@ export async function getAppBaseUrl(path: string = ''): Promise<string> {
     const headerStore = await headers()
     const host = headerStore.get('x-forwarded-host') || headerStore.get('host')
     const proto = headerStore.get('x-forwarded-proto') || (host && !host.includes('localhost') ? 'https' : 'http')
-    if (host) {
+    if (host && !host.includes('localhost')) {
       return `${proto}://${host.replace(/\/$/, '')}${cleanPath}`
     }
   } catch {
     // Suppress error if headers() is called outside request context
+  }
+
+  // Default production fallback to live Vercel deployment URL
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    return `https://digital-heroes-hiretrack-ai.vercel.app${cleanPath}`
   }
 
   if (envUrl) {
@@ -42,5 +47,5 @@ export async function getAppBaseUrl(path: string = ''): Promise<string> {
     return `${formatted.replace(/\/$/, '')}${cleanPath}`
   }
 
-  return `http://localhost:3000${cleanPath}`
+  return `https://digital-heroes-hiretrack-ai.vercel.app${cleanPath}`
 }
