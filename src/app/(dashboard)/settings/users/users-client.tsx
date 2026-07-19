@@ -667,7 +667,7 @@ export function UsersClient({
                 <label htmlFor="emp-team" className="text-xs font-semibold text-foreground">Team / Department</label>
                 <Select 
                   value={empTeamId || 'unassigned'} 
-                  onValueChange={(val) => setEmpTeamId(val === 'unassigned' ? '' : val)}
+                  onValueChange={(val) => setEmpTeamId(val === 'unassigned' ? '' : (val || ''))}
                   disabled={isPending}
                 >
                   <SelectTrigger id="emp-team" className="bg-background">
