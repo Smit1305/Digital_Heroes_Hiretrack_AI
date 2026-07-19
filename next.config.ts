@@ -78,6 +78,9 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Netlify Next.js Serverless Handler
+  output: 'standalone',
+
   // Compress responses
   compress: true,
 
