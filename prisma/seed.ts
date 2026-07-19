@@ -63,6 +63,13 @@ const USERS: Array<{
   avatar: string
 }> = [
   {
+    name: 'Demo Account',
+    email: 'demo@hiretrack.ai',
+    password: 'demo1234',
+    role: 'RECRUITER',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+  },
+  {
     name: 'Demo Recruiter',
     email: 'recruiter@hiretrack.ai',
     password: 'recruiterpassword123',

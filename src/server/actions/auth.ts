@@ -152,6 +152,7 @@ export async function signUpAction(
     organizationId = org.id
   }
 
+  const hasEmailProvider = !!process.env.RESEND_API_KEY
   const user = await db.user.create({
     data: {
       name,
@@ -160,6 +161,7 @@ export async function signUpAction(
       role: organizationId ? 'RECRUITER' : 'VIEWER',
       organizationId,
       isActive: true,
+      emailVerified: hasEmailProvider ? null : new Date(),
     },
   })
 

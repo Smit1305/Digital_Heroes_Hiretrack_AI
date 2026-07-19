@@ -135,6 +135,7 @@ export async function candidateSignUpAction(
   const fullName = `${firstName} ${lastName}`
 
   // Create User (CANDIDATE) and CandidateProfile
+  const hasEmailProvider = !!process.env.RESEND_API_KEY
   const user = await db.user.create({
     data: {
       name: fullName,
@@ -142,6 +143,7 @@ export async function candidateSignUpAction(
       passwordHash,
       role: 'CANDIDATE',
       isActive: true,
+      emailVerified: hasEmailProvider ? null : new Date(),
       candidateProfile: {
         create: {
           firstName,
