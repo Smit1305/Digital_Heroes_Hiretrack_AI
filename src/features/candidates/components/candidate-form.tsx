@@ -30,7 +30,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { createCandidateAction, updateCandidateAction } from '@/server/actions/candidates'
 import type { CandidateWithApplications } from '@/types/database'
 import { createCandidateSchema, type CreateCandidateInput } from '@/validators/candidate'
-import { CandidateStatus } from '@prisma/client'
+import { CandidateStatus } from '@/types/enums'
 
 const STATUS_LABELS: Record<CandidateStatus, string> = {
   ACTIVE: 'Active',

@@ -29,7 +29,7 @@ import type { InterviewerOption, SchedulableApplication } from '@/server/actions
 import { createInterviewAction, updateInterviewAction } from '@/server/actions/interviews'
 import type { InterviewWithDetails } from '@/types/database'
 import { createInterviewSchema, type CreateInterviewInput } from '@/validators/interview'
-import { InterviewType } from '@prisma/client'
+import { InterviewType } from '@/types/enums'
 import { TYPE_CONFIG } from './interview-type-badge'
 
 interface InterviewFormProps {

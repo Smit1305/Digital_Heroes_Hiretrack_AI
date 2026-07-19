@@ -17,7 +17,7 @@ import {
   suspendUserAction, 
   removeUserAction 
 } from '@/server/actions/users'
-import { UserRole } from '@prisma/client'
+import { UserRole } from '@/types/enums'
 import { ROLE_LABELS } from '@/lib/permissions'
 import { 
   UserPlus, 

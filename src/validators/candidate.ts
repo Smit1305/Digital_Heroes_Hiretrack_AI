@@ -1,4 +1,4 @@
-import { ApplicationStage, CandidateStatus } from '@prisma/client'
+import { ApplicationStage, CandidateStatus } from '@/types/enums'
 import { z } from 'zod'
 
 export const createCandidateSchema = z.object({

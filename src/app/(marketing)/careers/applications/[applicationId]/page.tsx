@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { OfferActions } from './offer-actions'
 import { Briefcase, Building2, Calendar, MapPin, Video } from 'lucide-react'
-import { ApplicationStage, OfferStatus } from '@prisma/client'
+import { ApplicationStage, OfferStatus } from '@/types/enums'
 
 export const dynamic = 'force-dynamic'
 

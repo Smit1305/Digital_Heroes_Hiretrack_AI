@@ -1,4 +1,4 @@
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 
 export const STAGE_CONFIG: Record<
   ApplicationStage,

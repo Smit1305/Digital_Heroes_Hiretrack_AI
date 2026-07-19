@@ -4,7 +4,7 @@ import { requirePermission } from '@/lib/auth-utils'
 import { db } from '@/lib/db'
 import type { ActionResult } from '@/types/api'
 import type { ApplicationWithDetails, KanbanColumn } from '@/types/database'
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 import { revalidatePath } from 'next/cache'
 import { PIPELINE_STAGES, STAGE_LABELS } from '@/features/pipeline/constants'
 

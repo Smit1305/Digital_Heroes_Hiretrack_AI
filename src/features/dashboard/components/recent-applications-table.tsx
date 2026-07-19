@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { RecentApplication } from '@/server/actions/dashboard'
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 import { formatDistanceToNow } from 'date-fns'
 
 const STAGE_STYLES: Record<ApplicationStage, string> = {

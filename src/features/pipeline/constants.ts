@@ -1,4 +1,4 @@
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 
 export const PIPELINE_STAGES: ApplicationStage[] = [
   ApplicationStage.APPLIED,

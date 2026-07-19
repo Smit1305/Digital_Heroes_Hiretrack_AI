@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { OrgPlan } from '@prisma/client'
+import { OrgPlan } from '@/types/enums'
 import { updateOrgPlanAction, toggleOrgSubscriptionAction } from '@/server/actions/admin'
 import {
   Building2,

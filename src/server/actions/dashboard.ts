@@ -9,7 +9,7 @@ import type {
     MonthlyHiringData,
     SourceData,
 } from '@/types/database'
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns'
 
 const STAGE_LABELS: Record<ApplicationStage, string> = {

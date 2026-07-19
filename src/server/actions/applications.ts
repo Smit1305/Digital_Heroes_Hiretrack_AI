@@ -10,7 +10,7 @@ import {
   type CreateOfferInput,
   type PublicApplyInput,
 } from '@/validators/application'
-import { ApplicationStage, OfferStatus } from '@prisma/client'
+import { ApplicationStage, OfferStatus } from '@/types/enums'
 import { revalidatePath } from 'next/cache'
 
 // ─── Candidate Online Application ─────────────────────────────────────────────

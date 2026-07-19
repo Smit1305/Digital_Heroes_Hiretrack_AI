@@ -1,4 +1,4 @@
-import { InterviewStatus, InterviewType } from '@prisma/client'
+import { InterviewStatus, InterviewType } from '@/types/enums'
 import { z } from 'zod'
 
 export const createInterviewSchema = z.object({

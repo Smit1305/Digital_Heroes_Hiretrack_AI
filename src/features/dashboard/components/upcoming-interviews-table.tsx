@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { UpcomingInterview } from '@/server/actions/dashboard'
-import { InterviewType } from '@prisma/client'
+import { InterviewType } from '@/types/enums'
 import { format, isToday, isTomorrow } from 'date-fns'
 import { Calendar, Clock, Monitor, Phone, Users, Video, Code, GitBranch, Brain, Heart, Briefcase } from 'lucide-react'
 

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { getPipelineAction, moveApplicationAction } from '@/server/actions/pipeline'
 import { PIPELINE_STAGES } from '@/features/pipeline/constants'
 import type { KanbanColumn } from '@/types/database'
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 import { PipelineColumn } from './pipeline-column'
 
 interface PipelineBoardProps {

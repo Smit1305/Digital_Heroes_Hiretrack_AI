@@ -15,7 +15,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { EmploymentType, JobStatus } from '@prisma/client'
+import { EmploymentType, JobStatus } from '@/types/enums'
 
 const STATUS_OPTIONS: { value: JobStatus | 'ALL'; label: string }[] = [
   { value: 'ALL', label: 'All statuses' },

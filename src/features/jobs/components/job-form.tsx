@@ -34,7 +34,7 @@ import {
     type CreateJobInput,
     type UpdateJobInput,
 } from '@/validators/job'
-import { EmploymentType, JobStatus } from '@prisma/client'
+import { EmploymentType, JobStatus } from '@/types/enums'
 
 const EMPLOYMENT_TYPE_LABELS: Record<EmploymentType, string> = {
   FULL_TIME: 'Full-time',

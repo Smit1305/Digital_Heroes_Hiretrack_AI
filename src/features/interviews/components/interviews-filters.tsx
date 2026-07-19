@@ -15,7 +15,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { InterviewStatus, InterviewType } from '@prisma/client'
+import { InterviewStatus, InterviewType } from '@/types/enums'
 import { STATUS_CONFIG, TYPE_CONFIG } from './interview-type-badge'
 
 const SORT_OPTIONS = [

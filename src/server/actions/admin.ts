@@ -3,7 +3,7 @@
 import { db } from '@/lib/db'
 import { auth } from '@/lib/auth'
 import type { ActionResult } from '@/types/api'
-import { OrgPlan } from '@prisma/client'
+import { OrgPlan } from '@/types/enums'
 import { revalidatePath } from 'next/cache'
 
 async function requireSuperAdmin() {

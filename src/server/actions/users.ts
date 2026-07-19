@@ -6,7 +6,7 @@ import type { ActionResult } from '@/types/api'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import crypto from 'crypto'
-import { UserRole } from '@prisma/client'
+import { UserRole } from '@/types/enums'
 
 import { sendEmail } from '@/lib/email'
 import { checkUserLimit } from '@/lib/plan-limits'

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { OrgPlan } from '@prisma/client'
+import { OrgPlan } from '@/types/enums'
 
 export const companyRegisterSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters').max(100),

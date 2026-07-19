@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { companyRegisterSchema, type CompanyRegisterInput } from '@/validators/company'
-import { OrgPlan } from '@prisma/client'
+import { OrgPlan } from '@/types/enums'
 
 const PASSWORD_RULES = [
   { label: '8+ characters', test: (v: string) => v.length >= 8 },

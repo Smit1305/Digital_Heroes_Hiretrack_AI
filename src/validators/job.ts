@@ -1,4 +1,4 @@
-import { EmploymentType, JobStatus } from '@prisma/client'
+import { EmploymentType, JobStatus } from '@/types/enums'
 import { z } from 'zod'
 
 export const createJobSchema = z.object({

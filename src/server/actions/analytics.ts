@@ -15,7 +15,7 @@ import {
 } from '@/types/analytics'
 import type { ActionResult } from '@/types/api'
 import type { HiringFunnelData, MonthlyHiringData, SourceData } from '@/types/database'
-import { ApplicationStage } from '@prisma/client'
+import { ApplicationStage } from '@/types/enums'
 import { endOfMonth, format, startOfMonth, subDays, subMonths } from 'date-fns'
 
 function getDateLimits(
