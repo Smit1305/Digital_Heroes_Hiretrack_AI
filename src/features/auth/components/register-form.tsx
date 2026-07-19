@@ -171,14 +171,11 @@ export function RegisterForm() {
 
           {/* Organization */}
           <div className="space-y-1.5">
-            <Label htmlFor="organizationName">
-              Organization name{' '}
-              <span className="text-muted-foreground font-normal">(optional)</span>
-            </Label>
+            <Label htmlFor="organizationName">Company / Organization Name</Label>
             <Input
               id="organizationName"
               type="text"
-              placeholder="Acme Corp"
+              placeholder="e.g. Acme Corp"
               aria-invalid={!!errors.organizationName}
               aria-describedby={errors.organizationName ? 'org-error' : undefined}
               {...register('organizationName')}

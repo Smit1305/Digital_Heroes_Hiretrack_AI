@@ -125,29 +125,26 @@ export async function signUpAction(
 
   const passwordHash = await bcrypt.hash(password, 12)
 
-  // Create org if name provided, otherwise create user without org
-  let organizationId: string | null = null
+  // Create organization for employer/owner (use fallback if empty)
+  const companyName = organizationName?.trim() || `${name.trim()}'s Workspace`
+  const slug = companyName
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
 
-  if (organizationName?.trim()) {
-    const slug = organizationName
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
+  // Ensure unique slug
+  const slugExists = await db.organization.findUnique({ where: { slug }, select: { id: true } })
+  const finalSlug = slugExists ? `${slug}-${Date.now()}` : slug
 
-    // Ensure unique slug
-    const slugExists = await db.organization.findUnique({ where: { slug }, select: { id: true } })
-    const finalSlug = slugExists ? `${slug}-${Date.now()}` : slug
-
-    const org = await db.organization.create({
-      data: {
-        name: organizationName.trim(),
-        slug: finalSlug,
-        plan: 'FREE',
-      },
-    })
-    organizationId = org.id
-  }
+  const org = await db.organization.create({
+    data: {
+      name: companyName,
+      slug: finalSlug,
+      plan: 'FREE',
+    },
+  })
+  const organizationId = org.id
 
   const hasEmailProvider = !!process.env.RESEND_API_KEY
   const user = await db.user.create({
@@ -155,7 +152,7 @@ export async function signUpAction(
       name,
       email: normalizedEmail,
       passwordHash,
-      role: organizationId ? 'RECRUITER' : 'VIEWER',
+      role: 'RECRUITER',
       organizationId,
       isActive: true,
       emailVerified: hasEmailProvider ? null : new Date(),
