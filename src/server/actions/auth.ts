@@ -152,7 +152,7 @@ export async function signUpAction(
       name,
       email: normalizedEmail,
       passwordHash,
-      role: 'RECRUITER',
+      role: 'OWNER',
       organizationId,
       isActive: true,
       emailVerified: hasEmailProvider ? null : new Date(),

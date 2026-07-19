@@ -24,7 +24,7 @@ export default async function SettingsBillingPage() {
     redirect('/onboarding')
   }
 
-  if (role !== 'OWNER' && role !== 'SUPER_ADMIN') {
+  if (role !== 'OWNER' && role !== 'SUPER_ADMIN' && role !== 'RECRUITER') {
     redirect('/settings') // redirect non-authorized members
   }
 

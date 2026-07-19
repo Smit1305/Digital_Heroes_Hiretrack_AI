@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { 
   inviteUserAction, 
+  createEmployeeAction,
   revokeInvitationAction, 
   updateUserRoleAction, 
   suspendUserAction, 
@@ -103,6 +104,51 @@ export function UsersClient({
   const [inviteRole, setInviteRole] = useState<UserRole>('VIEWER')
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+
+  // Direct Employee Creation States
+  const [isCreateEmployeeOpen, setIsCreateEmployeeOpen] = useState(false)
+  const [empName, setEmpName] = useState('')
+  const [empEmail, setEmpEmail] = useState('')
+  const [empPassword, setEmpPassword] = useState('')
+  const [empRole, setEmpRole] = useState<UserRole>('RECRUITER')
+  const [empTeamId, setEmpTeamId] = useState<string>('')
+
+  const handleOpenCreateEmployee = () => {
+    setEmpName('')
+    setEmpEmail('')
+    setEmpPassword('')
+    setEmpRole('RECRUITER')
+    setEmpTeamId('')
+    setFieldErrors({})
+    setIsCreateEmployeeOpen(true)
+  }
+
+  const handleCreateEmployeeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsPending(true)
+    setFieldErrors({})
+
+    const toastId = toast.loading('Creating employee account…')
+    const result = await createEmployeeAction({
+      name: empName,
+      email: empEmail,
+      password: empPassword,
+      role: empRole,
+      teamId: empTeamId || null,
+    })
+    setIsPending(false)
+
+    if (result.success) {
+      toast.success('Employee account created successfully.', { id: toastId })
+      setIsCreateEmployeeOpen(false)
+      router.refresh()
+    } else {
+      toast.error(result.error ?? 'Failed to create employee.', { id: toastId })
+      if (result.fieldErrors) {
+        setFieldErrors(result.fieldErrors)
+      }
+    }
+  }
 
   // Tab state
   const [activeTab, setActiveTab] = useState<'members' | 'suspended' | 'invitations'>('members')
@@ -253,10 +299,16 @@ export function UsersClient({
             Manage organization membership and permissions.
           </p>
         </div>
-        <Button onClick={handleOpenInvite} className="flex items-center gap-1.5">
-          <UserPlus className="h-4 w-4" aria-hidden="true" />
-          Invite User
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleOpenCreateEmployee} className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white">
+            <UserPlus className="h-4 w-4" aria-hidden="true" />
+            Create Employee Account
+          </Button>
+          <Button variant="outline" onClick={handleOpenInvite} className="flex items-center gap-1.5">
+            <Mail className="h-4 w-4" aria-hidden="true" />
+            Invite via Email
+          </Button>
+        </div>
       </div>
 
       {/* Tabs Row */}
@@ -533,6 +585,116 @@ export function UsersClient({
           </CardContent>
         </Card>
       )}
+
+      {/* CREATE EMPLOYEE DIRECTLY DIALOG */}
+      <Dialog open={isCreateEmployeeOpen} onOpenChange={setIsCreateEmployeeOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create Employee Account</DialogTitle>
+            <DialogDescription>
+              Directly create a new employee or team member account for your organization.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateEmployeeSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label htmlFor="emp-name" className="text-xs font-semibold text-foreground">Full Name</label>
+              <Input
+                id="emp-name"
+                type="text"
+                placeholder="Alex Morgan"
+                value={empName}
+                onChange={(e) => setEmpName(e.target.value)}
+                required
+                disabled={isPending}
+              />
+              {fieldErrors.name && (
+                <p className="text-xs font-medium text-destructive">{fieldErrors.name[0]}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="emp-email" className="text-xs font-semibold text-foreground">Work Email</label>
+              <Input
+                id="emp-email"
+                type="email"
+                placeholder="alex.morgan@company.com"
+                value={empEmail}
+                onChange={(e) => setEmpEmail(e.target.value)}
+                required
+                disabled={isPending}
+              />
+              {fieldErrors.email && (
+                <p className="text-xs font-medium text-destructive">{fieldErrors.email[0]}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="emp-password" className="text-xs font-semibold text-foreground">Initial Password</label>
+              <Input
+                id="emp-password"
+                type="password"
+                placeholder="Minimum 8 characters"
+                value={empPassword}
+                onChange={(e) => setEmpPassword(e.target.value)}
+                required
+                disabled={isPending}
+              />
+              {fieldErrors.password && (
+                <p className="text-xs font-medium text-destructive">{fieldErrors.password[0]}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label htmlFor="emp-role" className="text-xs font-semibold text-foreground">Role</label>
+                <Select 
+                  value={empRole} 
+                  onValueChange={(val) => setEmpRole(val as UserRole)}
+                  disabled={isPending}
+                >
+                  <SelectTrigger id="emp-role" className="bg-background">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(ROLE_LABELS).map(roleKey => (
+                      <SelectItem key={roleKey} value={roleKey}>{ROLE_LABELS[roleKey as UserRole]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="emp-team" className="text-xs font-semibold text-foreground">Team / Department</label>
+                <Select 
+                  value={empTeamId || 'unassigned'} 
+                  onValueChange={(val) => setEmpTeamId(val === 'unassigned' ? '' : val)}
+                  disabled={isPending}
+                >
+                  <SelectTrigger id="emp-team" className="bg-background">
+                    <SelectValue placeholder="Select team" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    {teams.map(team => (
+                      <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setIsCreateEmployeeOpen(false)} disabled={isPending}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                {isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                Create Employee
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* INVITE USER DIALOG */}
       <Dialog open={isInviteOpen} onOpenChange={handleCloseInvite}>

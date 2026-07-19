@@ -11,6 +11,7 @@ import { UserRole } from '@/types/enums'
 import { sendEmail } from '@/lib/email'
 import { checkUserLimit } from '@/lib/plan-limits'
 import { getAppBaseUrl } from '@/lib/app-url'
+import bcrypt from 'bcryptjs'
 
 const inviteSchema = z.object({
   email: z.string().email('Please enter a valid email address').trim().toLowerCase(),
@@ -392,6 +393,91 @@ export async function acceptInvitationAction(
   } catch (error) {
     console.error('Failed to accept invitation:', error)
     return { success: false, error: 'An unexpected error occurred while accepting the invitation.' }
+  }
+}
+
+// ─── Direct Employee Creation ──────────────────────────────────────────────────
+
+const createEmployeeSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  email: z.string().email('Please enter a valid email address').trim().toLowerCase(),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  role: z.nativeEnum(UserRole),
+  teamId: z.string().optional().nullable(),
+})
+
+export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>
+
+export async function createEmployeeAction(
+  input: CreateEmployeeInput
+): Promise<ActionResult<{ id: string; email: string }>> {
+  try {
+    const currentUser = await requirePermission('users:manage')
+    const orgId = currentUser.organizationId
+    if (!orgId) return { success: false, error: 'No organization found.' }
+
+    const parsed = createEmployeeSchema.safeParse(input)
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: 'Invalid input',
+        fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      }
+    }
+
+    const { name, email, password, role, teamId } = parsed.data
+
+    // Check plan limits
+    const limit = await checkUserLimit(orgId)
+    if (!limit.allowed) {
+      return {
+        success: false,
+        error: `Plan limit reached: You cannot add more than ${limit.max} active users on your current plan. Upgrade your subscription to add more team members.`,
+      }
+    }
+
+    // Check if email already exists
+    const existing = await db.user.findUnique({
+      where: { email },
+      select: { id: true },
+    })
+
+    if (existing) {
+      return { success: false, error: 'An account with this email already exists.' }
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12)
+
+    const newEmployee = await db.user.create({
+      data: {
+        name,
+        email,
+        passwordHash,
+        role,
+        organizationId: orgId,
+        teamId: teamId || null,
+        emailVerified: new Date(),
+        isActive: true,
+      },
+    })
+
+    await db.auditLog.create({
+      data: {
+        actorId: currentUser.id,
+        organizationId: orgId,
+        entityType: 'USER',
+        entityId: newEmployee.id,
+        action: 'CREATED',
+        newValue: { email, name, role },
+      },
+    })
+
+    revalidatePath('/settings/users')
+
+    return { success: true, data: { id: newEmployee.id, email: newEmployee.email } }
+  } catch (error) {
+    console.error('Error creating employee:', error)
+    return { success: false, error: 'Failed to create employee account.' }
   }
 }
 
