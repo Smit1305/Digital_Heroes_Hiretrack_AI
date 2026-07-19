@@ -200,14 +200,23 @@ export function CandidateLoginForm() {
         </form>
       </CardContent>
 
-      <CardFooter className="flex justify-center pt-0">
-        <p className="text-sm text-muted-foreground">
+      <CardFooter className="flex flex-col items-center gap-2 pt-0 text-xs text-muted-foreground">
+        <p>
           Don&apos;t have a candidate account?{' '}
           <Link
             href="/candidate/signup"
-            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-sm')}
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs')}
           >
-            Create one
+            Create Candidate Account
+          </Link>
+        </p>
+        <p className="text-muted-foreground/80">
+          Are you hiring?{' '}
+          <Link
+            href="/auth/login"
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs text-primary')}
+          >
+            Sign in as Employer
           </Link>
         </p>
       </CardFooter>

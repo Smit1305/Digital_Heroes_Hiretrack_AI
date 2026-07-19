@@ -73,8 +73,8 @@ export function LoginForm() {
   return (
     <Card className="w-full shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold">Sign in</CardTitle>
-        <CardDescription>Enter your credentials to access your account</CardDescription>
+        <CardTitle className="text-xl font-semibold">Employer & Team Sign in</CardTitle>
+        <CardDescription>Sign in to manage jobs, hiring pipelines, and interviews</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -207,14 +207,23 @@ export function LoginForm() {
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-center pt-0">
-        <p className="text-sm text-muted-foreground">
+      <CardFooter className="flex flex-col items-center gap-2 pt-0 text-xs text-muted-foreground">
+        <p>
           Don&apos;t have an account?{' '}
           <Link
             href="/auth/register"
-            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-sm')}
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs')}
           >
-            Create one
+            Create Employer Workspace
+          </Link>
+        </p>
+        <p className="text-muted-foreground/80">
+          Are you a job applicant?{' '}
+          <Link
+            href="/candidate/login"
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs text-primary')}
+          >
+            Sign in as Candidate
           </Link>
         </p>
       </CardFooter>

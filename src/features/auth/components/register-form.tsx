@@ -80,8 +80,8 @@ export function RegisterForm() {
   return (
     <Card className="w-full shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold">Create account</CardTitle>
-        <CardDescription>Start your free HireTrack AI workspace</CardDescription>
+        <CardTitle className="text-xl font-semibold">Hire Your Next Employee</CardTitle>
+        <CardDescription>Create your employer workspace to post jobs & track candidates</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -293,14 +293,23 @@ export function RegisterForm() {
         </p>
       </CardContent>
 
-      <CardFooter className="flex justify-center pt-0">
-        <p className="text-sm text-muted-foreground">
-          Already have an account?{' '}
+      <CardFooter className="flex flex-col items-center gap-2 pt-0 text-xs text-muted-foreground">
+        <p>
+          Already have an employer account?{' '}
           <Link
             href="/auth/login"
-            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-sm')}
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs')}
           >
             Sign in
+          </Link>
+        </p>
+        <p className="text-muted-foreground/80">
+          Looking for a job?{' '}
+          <Link
+            href="/candidate/signup"
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs text-primary')}
+          >
+            Create Candidate Account
           </Link>
         </p>
       </CardFooter>

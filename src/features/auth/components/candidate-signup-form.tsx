@@ -311,14 +311,23 @@ export function CandidateSignUpForm() {
         </form>
       </CardContent>
 
-      <CardFooter className="flex justify-center pt-0">
-        <p className="text-sm text-muted-foreground">
+      <CardFooter className="flex flex-col items-center gap-2 pt-0 text-xs text-muted-foreground">
+        <p>
           Already have a candidate account?{' '}
           <Link
             href="/candidate/login"
-            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-sm')}
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs')}
           >
             Sign in
+          </Link>
+        </p>
+        <p className="text-muted-foreground/80">
+          Are you hiring talent?{' '}
+          <Link
+            href="/auth/register"
+            className={cn(buttonVariants({ variant: 'link' }), 'p-0 h-auto font-medium text-xs text-primary')}
+          >
+            Create Employer Workspace
           </Link>
         </p>
       </CardFooter>
