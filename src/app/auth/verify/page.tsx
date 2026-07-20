@@ -25,7 +25,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
 
     if (result.success) {
       return (
-        <Card className="w-full shadow-sm">
+        <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
           <CardHeader className="text-center pb-4">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" aria-hidden="true" />
@@ -48,7 +48,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
     }
 
     return (
-      <Card className="w-full shadow-sm">
+      <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
             <TriangleAlert className="h-6 w-6 text-destructive" aria-hidden="true" />
@@ -66,7 +66,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
   }
 
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
       <CardHeader className="text-center pb-4">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <Mail className="h-6 w-6 text-primary" aria-hidden="true" />

@@ -34,7 +34,7 @@ export function ForgotPasswordForm() {
 
   if (submitted) {
     return (
-      <Card className="w-full shadow-sm">
+      <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Mail className="h-6 w-6 text-primary" aria-hidden="true" />
@@ -63,7 +63,7 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold">Forgot password?</CardTitle>
         <CardDescription>

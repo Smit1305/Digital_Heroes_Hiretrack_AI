@@ -48,7 +48,7 @@ export function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <Card className="w-full shadow-sm">
+      <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-xl">Invalid reset link</CardTitle>
           <CardDescription>
@@ -69,7 +69,7 @@ export function ResetPasswordForm() {
 
   if (success) {
     return (
-      <Card className="w-full shadow-sm">
+      <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
             <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" aria-hidden="true" />
@@ -89,7 +89,7 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold">Set new password</CardTitle>
         <CardDescription>Choose a strong password for your account.</CardDescription>

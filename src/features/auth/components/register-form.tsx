@@ -78,7 +78,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold">Hire Your Next Employee</CardTitle>
         <CardDescription>Create your employer workspace to post jobs & track candidates</CardDescription>

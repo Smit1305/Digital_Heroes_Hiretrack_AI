@@ -71,7 +71,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full max-w-sm sm:max-w-md mx-auto shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold">Employer & Team Sign in</CardTitle>
         <CardDescription>Sign in to manage jobs, hiring pipelines, and interviews</CardDescription>
