@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { CandidateWithApplications } from '@/types/database'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { CandidateForm } from './candidate-form'
 import { CandidateStatusBadge, StageBadge } from './candidate-status-badge'
 import { DeleteCandidateDialog } from './delete-candidate-dialog'
@@ -35,6 +36,7 @@ interface CandidateCardProps {
 }
 
 export function CandidateCard({ candidate, onMutated }: CandidateCardProps) {
+  const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
@@ -87,7 +89,7 @@ export function CandidateCard({ candidate, onMutated }: CandidateCardProps) {
                 <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuItem render={<Link href={`/candidates/${candidate.id}`} />}>
+                <DropdownMenuItem onClick={() => router.push(`/candidates/${candidate.id}`)}>
                   <User className="mr-2 h-4 w-4" />
                   View profile
                 </DropdownMenuItem>
@@ -96,7 +98,7 @@ export function CandidateCard({ candidate, onMutated }: CandidateCardProps) {
                   Edit
                 </DropdownMenuItem>
                 {candidate.linkedin && (
-                  <DropdownMenuItem render={<a href={candidate.linkedin} target="_blank" rel="noopener noreferrer" />}>
+                  <DropdownMenuItem onClick={() => window.open(candidate.linkedin!, '_blank')}>
                     <ExternalLink className="mr-2 h-4 w-4" />
                     LinkedIn
                   </DropdownMenuItem>

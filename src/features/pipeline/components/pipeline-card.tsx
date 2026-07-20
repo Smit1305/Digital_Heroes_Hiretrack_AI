@@ -4,6 +4,7 @@ import { Draggable } from '@hello-pangea/dnd'
 import { formatDistanceToNow } from 'date-fns'
 import { Briefcase, MoreHorizontal, Star, Trash2, Video } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { memo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
@@ -33,6 +34,7 @@ export const PipelineCard = memo(function PipelineCard({
   index,
   onStageChange,
 }: PipelineCardProps) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -109,7 +111,7 @@ export const PipelineCard = memo(function PipelineCard({
                 <MoreHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem render={<Link href={`/candidates/${application.candidateId}`} />}>
+                <DropdownMenuItem onClick={() => router.push(`/candidates/${application.candidateId}`)}>
                   View profile
                 </DropdownMenuItem>
                 {application.stage !== 'REJECTED' && (

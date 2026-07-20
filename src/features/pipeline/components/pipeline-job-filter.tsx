@@ -29,6 +29,7 @@ export function PipelineJobFilter({ jobs, selectedJobId }: PipelineJobFilterProp
       params.set('jobId', value)
     }
     router.push(`${pathname}?${params.toString()}`)
+    router.refresh()
   }
 
   return (

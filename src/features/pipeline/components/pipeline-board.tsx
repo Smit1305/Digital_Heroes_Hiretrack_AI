@@ -2,7 +2,7 @@
 
 import { DragDropContext, type DropResult } from '@hello-pangea/dnd'
 import { RefreshCw, RotateCcw } from 'lucide-react'
-import { useCallback, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,10 @@ export function PipelineBoard({ initialColumns, jobId }: PipelineBoardProps) {
   const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns)
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [isRefreshing, startRefresh] = useTransition()
+
+  useEffect(() => {
+    setColumns(initialColumns)
+  }, [initialColumns])
 
   // Move application between columns (optimistic)
   const applyMove = useCallback(

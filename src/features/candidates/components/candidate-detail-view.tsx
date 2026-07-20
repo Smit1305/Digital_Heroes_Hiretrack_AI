@@ -190,21 +190,13 @@ export function CandidateDetailView({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
                       {candidate.linkedin && (
-                        <DropdownMenuItem render={<a href={candidate.linkedin} target="_blank" rel="noopener noreferrer" />}>
+                        <DropdownMenuItem onClick={() => window.open(candidate.linkedin!, '_blank')}>
                           <Linkedin className="mr-2 h-4 w-4" />
                           LinkedIn
                         </DropdownMenuItem>
                       )}
                       {(candidate.portfolio ?? candidate.website) && (
-                        <DropdownMenuItem
-                          render={
-                            <a
-                              href={candidate.portfolio ?? candidate.website ?? '#'}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            />
-                          }
-                        >
+                        <DropdownMenuItem onClick={() => window.open(candidate.portfolio ?? candidate.website ?? '#', '_blank')}>
                           <ExternalLink className="mr-2 h-4 w-4" />
                           Portfolio
                         </DropdownMenuItem>

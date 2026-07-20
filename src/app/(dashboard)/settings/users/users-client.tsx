@@ -170,7 +170,19 @@ export function UsersClient({
     setIsPending(false)
 
     if (result.success) {
-      toast.success('Invitation sent successfully.', { id: toastId })
+      if (result.data.inviteUrl) {
+        try {
+          await navigator.clipboard.writeText(result.data.inviteUrl)
+        } catch {}
+        toast.success(
+          result.data.emailSent
+            ? 'Invitation sent! Link copied to clipboard.'
+            : 'Invitation created! Link copied to clipboard.',
+          { id: toastId }
+        )
+      } else {
+        toast.success('Invitation created successfully.', { id: toastId })
+      }
       setIsInviteOpen(false)
       router.refresh()
       
@@ -392,8 +404,10 @@ export function UsersClient({
                             onValueChange={(val) => handleUpdateTeam(member.id, val === 'unassigned' ? null : val)}
                             disabled={isSelf}
                           >
-                            <SelectTrigger className="h-8 text-xs min-w-[120px] bg-background border border-border">
-                              <SelectValue placeholder="Select team" />
+                            <SelectTrigger className="h-8 text-xs min-w-[130px] bg-background border border-border">
+                              <SelectValue placeholder="Select team">
+                                {teams.find(t => t.id === member.teamId)?.name ?? 'Unassigned'}
+                              </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="unassigned" className="text-xs">Unassigned</SelectItem>
@@ -404,7 +418,7 @@ export function UsersClient({
                           </Select>
                         </div>
 
-                        {/* Role Selector (System and Custom combined) */}
+                        {/* Role Selector (System Role) */}
                         <div className="flex flex-col space-y-1">
                           <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">System Role</span>
                           <Select 
@@ -412,8 +426,10 @@ export function UsersClient({
                             onValueChange={(val) => handleUpdateRole(member.id, val as UserRole, member.customRoleId)}
                             disabled={isSelf}
                           >
-                            <SelectTrigger className="h-8 text-xs min-w-[120px] bg-background border border-border">
-                              <SelectValue placeholder="System Role" />
+                            <SelectTrigger className="h-8 text-xs min-w-[130px] bg-background border border-border">
+                              <SelectValue placeholder="System Role">
+                                {ROLE_LABELS[member.role] ?? member.role}
+                              </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                               {Object.keys(ROLE_LABELS).map(roleKey => (
@@ -431,8 +447,10 @@ export function UsersClient({
                             onValueChange={(val) => handleUpdateRole(member.id, member.role, val === 'none' ? null : val)}
                             disabled={isSelf}
                           >
-                            <SelectTrigger className="h-8 text-xs min-w-[120px] bg-background border border-border">
-                              <SelectValue placeholder="None" />
+                            <SelectTrigger className="h-8 text-xs min-w-[130px] bg-background border border-border">
+                              <SelectValue placeholder="None">
+                                {roles.find(r => r.id === member.customRoleId)?.name ?? 'None'}
+                              </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="none" className="text-xs">None</SelectItem>

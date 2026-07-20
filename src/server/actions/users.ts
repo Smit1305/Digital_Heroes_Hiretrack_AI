@@ -20,7 +20,7 @@ const inviteSchema = z.object({
 
 export type InviteInput = z.infer<typeof inviteSchema>
 
-export async function inviteUserAction(input: InviteInput): Promise<ActionResult<{ id: string; token: string }>> {
+export async function inviteUserAction(input: InviteInput): Promise<ActionResult<{ id: string; token: string; inviteUrl?: string; emailSent?: boolean }>> {
   try {
     const user = await requirePermission('users:manage')
     const orgId = user.organizationId
@@ -85,18 +85,24 @@ export async function inviteUserAction(input: InviteInput): Promise<ActionResult
     })
 
     const inviteUrl = await getAppBaseUrl(`/auth/accept-invite?token=${token}`)
+    let emailSent = true
 
-    await sendEmail({
-      to: email,
-      subject: `Invite to join ${orgName} on HireTrack AI`,
-      text: `You have been invited to join ${orgName} as a ${role.toLowerCase().replace('_', ' ')}. Accept your invitation by opening this link: ${inviteUrl}`,
-      html: `
-        <p>You have been invited to join <strong>${orgName}</strong> on HireTrack AI.</p>
-        <p>Your assigned role: <strong>${role.replace('_', ' ')}</strong></p>
-        <p><a href="${inviteUrl}">Accept Invitation</a></p>
-        <p>This link expires in 7 days.</p>
-      `,
-    })
+    try {
+      await sendEmail({
+        to: email,
+        subject: `Invite to join ${orgName} on HireTrack AI`,
+        text: `You have been invited to join ${orgName} as a ${role.toLowerCase().replace('_', ' ')}. Accept your invitation by opening this link: ${inviteUrl}`,
+        html: `
+          <p>You have been invited to join <strong>${orgName}</strong> on HireTrack AI.</p>
+          <p>Your assigned role: <strong>${role.replace('_', ' ')}</strong></p>
+          <p><a href="${inviteUrl}">Accept Invitation</a></p>
+          <p>This link expires in 7 days.</p>
+        `,
+      })
+    } catch (err) {
+      console.warn('Failed to dispatch invite email:', err)
+      emailSent = false
+    }
 
     await db.auditLog.create({
       data: {
@@ -110,7 +116,7 @@ export async function inviteUserAction(input: InviteInput): Promise<ActionResult
     })
 
     revalidatePath('/settings/users')
-    return { success: true, data: { id: invitation.id, token } }
+    return { success: true, data: { id: invitation.id, token, inviteUrl, emailSent } }
   } catch (error) {
     console.error('Failed to invite user:', error)
     return { success: false, error: 'An unexpected error occurred while inviting the user.' }
@@ -360,32 +366,32 @@ export async function acceptInvitationAction(
 
     const passwordHash = await bcrypt.hash(password, 12)
 
-    await db.$transaction([
-      db.user.create({
-        data: {
-          name,
-          email: normalizedEmail,
-          passwordHash,
-          role: invitation.role,
-          organizationId: invitation.organizationId,
-          emailVerified: new Date(),
-        },
-      }),
-      db.invitation.update({
-        where: { id: invitation.id },
-        data: { accepted: true },
-      }),
-      db.auditLog.create({
-        data: {
-          actorId: invitation.id, // Invitation identifier act as placeholder
-          organizationId: invitation.organizationId,
-          entityType: 'USER',
-          entityId: invitation.id,
-          action: 'USER_REGISTERED',
-          newValue: { email: normalizedEmail, role: invitation.role },
-        },
-      }),
-    ])
+    const newUser = await db.user.create({
+      data: {
+        name,
+        email: normalizedEmail,
+        passwordHash,
+        role: invitation.role,
+        organizationId: invitation.organizationId,
+        emailVerified: new Date(),
+      },
+    })
+
+    await db.invitation.update({
+      where: { id: invitation.id },
+      data: { accepted: true },
+    })
+
+    await db.auditLog.create({
+      data: {
+        actorId: newUser.id,
+        organizationId: invitation.organizationId,
+        entityType: 'USER',
+        entityId: newUser.id,
+        action: 'USER_REGISTERED',
+        newValue: { email: normalizedEmail, role: invitation.role },
+      },
+    })
 
     return { success: true, data: { email: normalizedEmail } }
   } catch (error) {

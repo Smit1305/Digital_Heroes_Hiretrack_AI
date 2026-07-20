@@ -24,7 +24,7 @@ const cspHeader = [
   "frame-src 'self' https://accounts.google.com",
   "frame-ancestors 'none'",
   // Media
-  "media-src 'self' blob:",
+  "media-src 'self' blob: data:",
   // Object
   "object-src 'none'",
   // Base URI — prevent base tag injection

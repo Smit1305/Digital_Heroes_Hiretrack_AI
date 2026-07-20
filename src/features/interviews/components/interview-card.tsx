@@ -14,6 +14,7 @@ import {
     X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
@@ -67,6 +68,7 @@ export function InterviewCard({
   canFeedback,
   canDelete,
 }: InterviewCardProps) {
+  const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [rescheduleOpen, setRescheduleOpen] = useState(false)
@@ -168,12 +170,12 @@ export function InterviewCard({
                 <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem render={<Link href={`/candidates/${interview.candidate.id}`} />}>
+                <DropdownMenuItem onClick={() => router.push(`/candidates/${interview.candidate.id}`)}>
                   <User className="mr-2 h-4 w-4" />
                   View candidate
                 </DropdownMenuItem>
 
-                <DropdownMenuItem render={<a href={`/api/interviews/${interview.id}/ics`} download />}>
+                <DropdownMenuItem onClick={() => window.open(`/api/interviews/${interview.id}/ics`, '_blank')}>
                   <Calendar className="mr-2 h-4 w-4" />
                   Export Calendar (.ics)
                 </DropdownMenuItem>
@@ -193,7 +195,7 @@ export function InterviewCard({
                 )}
 
                 {canFeedback && (canActOnInterview || isCompleted) && (
-                  <DropdownMenuItem render={<Link href={`/interviews/${interview.id}/feedback`} />}>
+                  <DropdownMenuItem onClick={() => router.push(`/interviews/${interview.id}/feedback`)}>
                     <MessageSquare className="mr-2 h-4 w-4" />
                     {interview.feedback ? 'Edit scorecard' : 'Submit scorecard'}
                   </DropdownMenuItem>
