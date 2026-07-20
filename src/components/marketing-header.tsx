@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { toast } from 'sonner'
-import { LogOut, Settings, User } from 'lucide-react'
+import { LogOut, Menu, Settings, User, X } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +32,7 @@ interface MarketingHeaderProps {
 export function MarketingHeader({ user }: MarketingHeaderProps) {
   const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -87,17 +88,17 @@ export function MarketingHeader({ user }: MarketingHeaderProps) {
           ))}
         </nav>
 
-        {/* CTA buttons / User menu */}
+        {/* Desktop Right items & Mobile Toggle */}
         <div className="flex items-center gap-3">
           {user ? (
             <>
               <Link
                 href={getDashboardHref()}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                className="hidden sm:inline-flex text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
               >
                 Dashboard
               </Link>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger
                   render={
@@ -183,14 +184,84 @@ export function MarketingHeader({ user }: MarketingHeaderProps) {
               </Link>
               <Link
                 href="/auth/select-account"
-                className="inline-flex items-center justify-center rounded-lg bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-foreground/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="hidden sm:inline-flex items-center justify-center rounded-lg bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-foreground/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Get Started
               </Link>
             </>
           )}
+
+          {/* Mobile hamburger menu toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden h-9 w-9 p-0"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            )}
+          </Button>
         </div>
       </div>
+
+      {/* Mobile Drawer Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-b bg-background/95 backdrop-blur-md px-4 pt-3 pb-6 space-y-4 shadow-xl animate-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col space-y-1">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex flex-col gap-2 pt-2 border-t border-border">
+            {user ? (
+              <Link
+                href={getDashboardHref()}
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center h-10 rounded-xl bg-foreground text-background font-medium text-sm shadow-sm"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/careers"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center h-10 rounded-xl border border-input text-foreground font-medium text-sm hover:bg-muted"
+                >
+                  Find Jobs
+                </Link>
+                <Link
+                  href="/auth/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center h-10 rounded-xl border border-input text-foreground font-medium text-sm hover:bg-muted"
+                >
+                  Company Login
+                </Link>
+                <Link
+                  href="/auth/select-account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center h-10 rounded-xl bg-foreground text-background font-semibold text-sm shadow-sm hover:bg-foreground/90"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   )
 }
