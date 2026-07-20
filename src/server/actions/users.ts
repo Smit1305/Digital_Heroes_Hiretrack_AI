@@ -54,14 +54,6 @@ export async function inviteUserAction(input: InviteInput): Promise<ActionResult
       return { success: false, error: 'User is already a member of this organization.' }
     }
 
-    // Check if active invitation already exists
-    const existingInvite = await db.invitation.findFirst({
-      where: { email, organizationId: orgId, accepted: false, expires: { gte: new Date() } }
-    })
-    if (existingInvite) {
-      return { success: false, error: 'An active invitation has already been sent to this email.' }
-    }
-
     // Fetch org name
     const org = await db.organization.findUnique({
       where: { id: orgId },
@@ -74,15 +66,32 @@ export async function inviteUserAction(input: InviteInput): Promise<ActionResult
     const expires = new Date()
     expires.setDate(expires.getDate() + 7) // 7 days expiration
 
-    const invitation = await db.invitation.create({
-      data: {
-        email,
-        role,
-        organizationId: orgId,
-        token,
-        expires,
-      }
+    // Check if active or past invitation already exists for this email
+    const existingInvite = await db.invitation.findFirst({
+      where: { email, organizationId: orgId, accepted: false }
     })
+
+    let invitation
+    if (existingInvite) {
+      invitation = await db.invitation.update({
+        where: { id: existingInvite.id },
+        data: {
+          token,
+          expires,
+          role,
+        }
+      })
+    } else {
+      invitation = await db.invitation.create({
+        data: {
+          email,
+          role,
+          organizationId: orgId,
+          token,
+          expires,
+        }
+      })
+    }
 
     const inviteUrl = await getAppBaseUrl(`/auth/accept-invite?token=${token}`)
     let emailSent = true
@@ -104,22 +113,32 @@ export async function inviteUserAction(input: InviteInput): Promise<ActionResult
       emailSent = false
     }
 
-    await db.auditLog.create({
-      data: {
-        actorId: user.id,
-        organizationId: orgId,
-        entityType: 'USER',
-        entityId: invitation.id,
-        action: 'USER_INVITED',
-        newValue: { email, role, expires },
-      }
-    })
+    try {
+      const dbUser = await db.user.findUnique({ where: { id: user.id }, select: { id: true } })
+      await db.auditLog.create({
+        data: {
+          actorId: dbUser?.id ?? null,
+          organizationId: orgId,
+          entityType: 'USER',
+          entityId: invitation.id,
+          action: 'USER_INVITED',
+          newValue: { email, role, expires },
+        }
+      })
+    } catch (auditErr) {
+      console.warn('Failed to log user invite audit event:', auditErr)
+    }
 
     revalidatePath('/settings/users')
     return { success: true, data: { id: invitation.id, token, inviteUrl, emailSent } }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to invite user:', error)
-    return { success: false, error: 'An unexpected error occurred while inviting the user.' }
+    const msg = error?.message === 'UNAUTHORIZED' 
+      ? 'You must be signed in to perform this action.'
+      : error?.message === 'FORBIDDEN'
+      ? 'You do not have permission to invite users.'
+      : (error?.message || 'An unexpected error occurred while inviting the user.')
+    return { success: false, error: msg }
   }
 }
 
